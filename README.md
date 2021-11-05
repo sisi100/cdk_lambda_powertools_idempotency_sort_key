@@ -1,4 +1,4 @@
-# Lambdaの冪等性をLambdaPowertoolsで実装する
+# Lambdaの冪等性をLambdaPowertoolsで実装する（カスタムして PartitionKey + SortKey で使う）
 
 ```
 cdk deploy
