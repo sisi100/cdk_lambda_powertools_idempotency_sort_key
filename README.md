@@ -6,4 +6,4 @@ cdk deploy
 
 blog post:
 
-https://blog.i-tale.jp/2021/09/d11/
+https://blog.i-tale.jp/2021/11/d21/
