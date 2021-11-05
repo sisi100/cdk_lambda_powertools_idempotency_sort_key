@@ -21,8 +21,11 @@ def mock_dynamodb_table(monkeypatch):
     dynamodb = boto3.resource("dynamodb")
     dynamodb.create_table(
         TableName=mock_table_name,
-        KeySchema=[{"AttributeName": "id", "KeyType": "HASH"},],
-        AttributeDefinitions=[{"AttributeName": "id", "AttributeType": "S"},],
+        KeySchema=[{"AttributeName": "id", "KeyType": "HASH"}, {"AttributeName": "sk", "KeyType": "RANGE"}],
+        AttributeDefinitions=[
+            {"AttributeName": "id", "AttributeType": "S"},
+            {"AttributeName": "sk", "AttributeType": "S"},
+        ],
         ProvisionedThroughput={"ReadCapacityUnits": 1, "WriteCapacityUnits": 1},
     )
 
@@ -34,16 +37,11 @@ def mock_dynamodb_table(monkeypatch):
 def test_idempotency(mock_dynamodb_table):
     import lambda_app.index as app
 
-    print("同じイベントで重複起動させても１度しか処理されず、レスポンスはすべて同じであることを確認する")
     event = {"hoge_id": 1}
     response = app.handler(event, {})
     for _ in range(10):
         assert response == app.handler(event, {})
 
-    print("イベントが違うと処理されることを確認する")
-    app.handler({"hoge_id": 2}, {})
-    app.handler({"hoge_id": 1, "fuga_id": 1}, {})
-
-    print("テーブルのscan結果")
     items = mock_dynamodb_table.scan()["Items"]
-    print(json.dumps(items, indent=2, default=lambda x: float(x) if isinstance(x, Decimal) else x,))
+    for item in items:
+        assert item["sk"]

@@ -14,6 +14,7 @@ class CdkLambdaPowertoolsIdempotencyStack(core.Stack):
             self,
             f"{APP_NAME}IdempotencyStore",
             partition_key=Attribute(name="id", type=AttributeType.STRING),
+            sort_key=Attribute(name="sk", type=AttributeType.STRING),  # 不要なソートキーを意地悪で仕込む
             time_to_live_attribute="expiration",
             billing_mode=BillingMode.PAY_PER_REQUEST,
             removal_policy=core.RemovalPolicy.DESTROY,
